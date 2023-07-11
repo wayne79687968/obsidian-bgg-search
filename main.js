@@ -1,4 +1,4 @@
-const { Plugin, Modal, TFile, PluginSettingTab, Setting } = require('obsidian');
+const { Plugin, Modal, TFile, PluginSettingTab, Setting, Notice } = require('obsidian');
 
 class BGGPlugin extends Plugin {
     settings = {};
@@ -54,9 +54,12 @@ class BGGSearchModal extends Modal {
             if (e.key === 'Enter') {
                 // Clear the results container
                 this.resultsContainer.empty();
+                let loadingNotice = new Notice('Loading...');
 
                 let query = e.target.value;
                 let results = await this.searchBGG(query);
+
+                loadingNotice.hide();
 
                 this.displayResults(results);
 
@@ -90,11 +93,15 @@ class BGGSearchModal extends Modal {
     }
 
     async displayGameDetails(id) {
+        let loadingNotice = new Notice('Loading...');
+
         let response = await fetch(`https://www.boardgamegeek.com/xmlapi2/thing?id=${id}&stats=1&comments=1`);
         let data = await response.text();
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(data, "text/xml");
         let item = xmlDoc.getElementsByTagName('item')[0];
+
+        loadingNotice.hide();
 
         // Extract game details
         let details = {
