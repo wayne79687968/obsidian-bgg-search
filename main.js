@@ -1,7 +1,11 @@
-const { Plugin, Modal, TFile } = require('obsidian');
+const { Plugin, Modal, TFile, PluginSettingTab, Setting } = require('obsidian');
 
 class BGGPlugin extends Plugin {
+    settings = {};
+
     async onload() {
+        await this.loadSettings();
+
         this.addCommand({
             id: 'search-bgg',
             name: 'Search BoardGameGeek',
@@ -14,12 +18,30 @@ class BGGPlugin extends Plugin {
                 return true;
             },
         });
+
+        this.addSettingTab(new BGGSettingTab(this.app, this));
+    }
+
+    async loadSettings() {
+        this.settings = Object.assign({}, await this.loadData());
+        if (!this.settings) {
+            this.settings = {
+                notePath: ''
+            };
+        }
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
     }
 }
 
 class BGGSearchModal extends Modal {
-    constructor(app) {
+    notePath;
+
+    constructor(app, settings) {
         super(app);
+        this.notePath = settings.notePath;
     }
 
     onOpen() {
@@ -92,7 +114,7 @@ class BGGSearchModal extends Modal {
         const noteContent = `\-\-\-\nobsidianUIMode: preview\n\-\-\-\n>[!bgg]+ [${details.title}](https://boardgamegeek.com/boardgame/${id})\n>>[!multi-column|left|2]\n>>![test|250](${details.image})\n>>\n>>>[!data]+ Data\n>>>- Year Published: ${details.yearpublished}\n>>>- Players: ${details.minplayers} ~ ${details.maxplayers}\n>>>- Play Time: ${details.minplaytime} ~ ${details.maxplaytime} min\n>>>- Rank: ${details.rank}\n>>>- Weight (0~5): ${details.weight}\n>>>- Score (1~10): ${details.score}\n>>>- Designers: ${details.designers}\n>>>- Artists: ${details.artists}\n\n${details.comments}`
 
         // Get the notePath from the plugin settings
-        let notePath = 'Inbox/Boardgame/Search/' + sanitized_name + '.md';
+        let notePath = this.notePath + '/' + sanitized_name + '.md';
 
         // Create a new note in the specified notePath
         let note = this.app.vault.getAbstractFileByPath(notePath);
@@ -109,6 +131,32 @@ class BGGSearchModal extends Modal {
         await this.app.workspace.getLeaf().openFile(note);
 
         this.close();
+    }
+}
+
+class BGGSettingTab extends PluginSettingTab {
+    plugin;
+
+    constructor(app, plugin) {
+        super(app, plugin);
+        this.plugin = plugin;
+    }
+
+    display() {
+        let { containerEl } = this;
+
+        containerEl.empty();
+
+        new Setting(containerEl)
+            .setName('notePath')
+            .setDesc('Enter the notePath where the game details will be saved.')
+            .addText(text => text
+                .setPlaceholder('Enter notePath')
+                .setValue(this.plugin.settings.notePath || '')
+                .onChange(async(value) => {
+                    this.plugin.settings.notePath = value;
+                    await this.plugin.saveSettings();
+                }));
     }
 }
 
