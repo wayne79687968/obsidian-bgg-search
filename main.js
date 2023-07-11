@@ -97,7 +97,8 @@ class BGGSearchModal extends Modal {
         let items = Array.from(xmlDoc.getElementsByTagName('item')).slice(0, 50);
         return items.map(item => ({
             id: item.getAttribute('id'),
-            name: item.getElementsByTagName('name')[0].getAttribute('value')
+            name: item.getElementsByTagName('name')[0].getAttribute('value'),
+            yearpublished: item.getElementsByTagName('yearpublished')[0] ? item.getElementsByTagName('yearpublished')[0].getAttribute('value') : "N/A"
         }));
     }
 
@@ -108,7 +109,7 @@ class BGGSearchModal extends Modal {
         // Display each result
         results.forEach((result) => {
             let resultEl = this.resultsContainer.createEl('div');
-            resultEl.createEl('button', { text: result.name }).addEventListener('click', () => this.displayGameDetails(result.id));
+            resultEl.createEl('button', { text: `${result.name} (${result.yearpublished})` }).addEventListener('click', () => this.displayGameDetails(result.id));
         });
     }
 
