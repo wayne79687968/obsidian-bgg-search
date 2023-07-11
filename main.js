@@ -94,7 +94,7 @@ class BGGSearchModal extends Modal {
         let data = await response.text();
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(data, "text/xml");
-        let items = Array.from(xmlDoc.getElementsByTagName('item')).slice(0, 10);
+        let items = Array.from(xmlDoc.getElementsByTagName('item')).slice(0, 50);
         return items.map(item => ({
             id: item.getAttribute('id'),
             name: item.getElementsByTagName('name')[0].getAttribute('value')
