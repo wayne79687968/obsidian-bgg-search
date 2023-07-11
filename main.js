@@ -38,6 +38,7 @@ class BGGPlugin extends Plugin {
 
 class BGGSearchModal extends Modal {
     notePath;
+    resultsContainer;
 
     constructor(app, settings) {
         super(app);
@@ -47,12 +48,12 @@ class BGGSearchModal extends Modal {
     onOpen() {
         let { contentEl } = this;
         let searchInput = contentEl.createEl('input', { type: 'text' });
-        let resultsContainer = contentEl.createEl('div');
+        this.resultsContainer = contentEl.createEl('div');
 
         searchInput.addEventListener('keydown', async(e) => {
             if (e.key === 'Enter') {
                 // Clear the results container
-                resultsContainer.empty();
+                this.resultsContainer.empty();
 
                 let query = e.target.value;
                 let results = await this.searchBGG(query);
@@ -78,9 +79,12 @@ class BGGSearchModal extends Modal {
     }
 
     displayResults(results) {
+        // Clear the results container
+        this.resultsContainer.empty();
+
         // Display each result
         results.forEach((result) => {
-            let resultEl = this.contentEl.createEl('div');
+            let resultEl = this.resultsContainer.createEl('div');
             resultEl.createEl('button', { text: result.name }).addEventListener('click', () => this.displayGameDetails(result.id));
         });
     }
