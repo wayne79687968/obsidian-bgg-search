@@ -39,10 +39,16 @@ class BGGPlugin extends Plugin {
 class BGGSearchModal extends Modal {
     notePath;
     resultsContainer;
+    apiKey;
+    enableTranslation;
+    translationLanguage;
 
     constructor(app, settings) {
         super(app);
         this.notePath = settings.notePath;
+        this.apiKey = settings.apiKey;
+        this.enableTranslation = settings.enableTranslation;
+        this.translationLanguage = settings.translationLanguage;
     }
 
     onOpen() {
@@ -67,6 +73,20 @@ class BGGSearchModal extends Modal {
                 e.preventDefault();
             }
         });
+    }
+
+    async translate(text) {
+        const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${this.apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                q: text,
+                target: this.translationLanguage
+            })
+        });
+
+        const data = await response.json();
+        return data.data.translations[0].translatedText;
     }
 
     async searchBGG(query) {
@@ -100,6 +120,15 @@ class BGGSearchModal extends Modal {
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(data, "text/xml");
         let item = xmlDoc.getElementsByTagName('item')[0];
+
+        if (this.enableTranslation) {
+            let comments = Array.from(item.getElementsByTagName('comment')).slice(0, 50);
+            for (let i = 0; i < comments.length; i++) {
+                let comment = comments[i];
+                let translatedText = await this.translate(comment.getAttribute('value'), this.translationLanguage, this.apiKey);
+                comment.setAttribute('value', translatedText);
+            }
+        }
 
         loadingNotice.hide();
 
@@ -166,6 +195,38 @@ class BGGSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.notePath || '')
                 .onChange(async(value) => {
                     this.plugin.settings.notePath = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('Enable Translation')
+            .setDesc('Enable translation of comments')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.enableTranslation || false)
+                .onChange(async(value) => {
+                    this.plugin.settings.enableTranslation = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('API Key')
+            .setDesc('Enter your Google Translate API key')
+            .addText(text => text
+                .setPlaceholder('Enter API key')
+                .setValue(this.plugin.settings.apiKey || '')
+                .onChange(async(value) => {
+                    this.plugin.settings.apiKey = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('Translation Language')
+            .setDesc('Enter the target language for translation (e.g., "zh-TW" for Traditional Chinese)')
+            .addText(text => text
+                .setPlaceholder('Enter language code')
+                .setValue(this.plugin.settings.translationLanguage || '')
+                .onChange(async(value) => {
+                    this.plugin.settings.translationLanguage = value;
                     await this.plugin.saveSettings();
                 }));
     }
