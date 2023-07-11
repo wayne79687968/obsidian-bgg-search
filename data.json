@@ -1,3 +1,6 @@
 {
-    "notePath": ""
+    "notePath": "",
+    "apiKey": "",
+    "translationLanguage": "zh-TW",
+    "enableTranslation": true
 }
