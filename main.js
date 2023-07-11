@@ -87,7 +87,27 @@ class BGGSearchModal extends Modal {
             score: item.getElementsByTagName('average')[0].getAttribute('value'),
             comments: Array.from(item.getElementsByTagName('comment')).slice(0, 50).map(el => `> [!score]+ ( ${el.getAttribute('rating')} )\n> ${el.getAttribute('value')}\n`).join('\n')
         };
-        console.log(details);
+
+        const sanitized_name = details.title.replace(/[\\/*"<>:|?]/g, '')
+        const noteContent = `\-\-\-\nobsidianUIMode: preview\n\-\-\-\n>[!bgg]+ [${details.title}](https://boardgamegeek.com/boardgame/${id})\n>>[!multi-column|left|2]\n>>![test|250](${details.image})\n>>\n>>>[!data]+ Data\n>>>- Year Published: ${details.yearpublished}\n>>>- Players: ${details.minplayers} ~ ${details.maxplayers}\n>>>- Play Time: ${details.minplaytime} ~ ${details.maxplaytime} min\n>>>- Rank: ${details.rank}\n>>>- Weight (0~5): ${details.weight}\n>>>- Score (1~10): ${details.score}\n>>>- Designers: ${details.designers}\n>>>- Artists: ${details.artists}\n\n${details.comments}`
+
+        // Get the notePath from the plugin settings
+        let notePath = 'Inbox/Boardgame/Search/' + sanitized_name + '.md';
+
+        // Create a new note in the specified notePath
+        let note = this.app.vault.getAbstractFileByPath(notePath);
+
+        if (note instanceof TFile) {
+            // If the note already exists, update it
+            await this.app.vault.modify(note, noteContent);
+        } else {
+            // If the note doesn't exist, create it
+            note = await this.app.vault.create(notePath, noteContent);
+        }
+
+        // Open the new file
+        await this.app.workspace.getLeaf().openFile(note);
+
         this.close();
     }
 }
