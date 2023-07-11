@@ -1,0 +1,9 @@
+{
+    "id": "bgg-search",
+    "name": "BGG Search",
+    "version": "0.1.0",
+    "description": "Search for games on BoardGameGeek from within Obsidian.",
+    "author": "Skogkatt",
+    "main": "main.js",
+    "minAppVersion": "0.9.20"
+}
