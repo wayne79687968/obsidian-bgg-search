@@ -180,7 +180,7 @@ obsidianUIMode: preview
 >>>- Year Published: \`= this.yearpublished\`
 >>>- Players: \`= this.minplayers\` ~ \`= this.maxplayers\`
 >>>- Play Time: \`= this.minplaytime\` ~ \`= this.maxplaytime\` min
->>>- Rank: \`= this.rank\`
+>>>- Rank: **\`= this.rank\`**
 >>>- Weight (0~5): \`= this.weight\`
 >>>- Score (1~10): \`= this.score\`
 >>>- Designers: \`= this.designers\`
