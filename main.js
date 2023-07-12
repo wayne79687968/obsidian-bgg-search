@@ -148,6 +148,7 @@ class BGGSearchModal extends Modal {
             rank: item.getElementsByTagName('rank')[0].getAttribute('value'),
             weight: item.getElementsByTagName('averageweight')[0].getAttribute('value'),
             score: item.getElementsByTagName('average')[0].getAttribute('value'),
+            description: item.getElementsByTagName('description')[0].textContent,
             comments: Array.from(item.getElementsByTagName('comment')).slice(0, 50).map(el => `> [!score]+ ( ${el.getAttribute('rating')} )\n> ${el.getAttribute('value')}\n`).join('\n')
         };
 
@@ -184,6 +185,9 @@ obsidianUIMode: preview
 >>>- Score (1~10): \`= this.score\`
 >>>- Designers: \`= this.designers\`
 >>>- Artists: \`= this.artists\`
+>
+>>[!description]+ Description
+>>${details.description}
 
 ${details.comments}`
 
