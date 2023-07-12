@@ -143,8 +143,8 @@ class BGGSearchModal extends Modal {
             minplaytime: item.getElementsByTagName('minplaytime')[0].getAttribute('value'),
             maxplaytime: item.getElementsByTagName('maxplaytime')[0].getAttribute('value'),
             playingtime: item.getElementsByTagName('playingtime')[0].getAttribute('value'),
-            designers: Array.from(item.querySelectorAll('link[type="boardgamedesigner"]')).map(link => '"' + link.getAttribute('value') + '"').join(', ') ?? '',
-            artists: Array.from(item.querySelectorAll('link[type="boardgameartist"]')).map(link => '"' + link.getAttribute('value') + '"').join(', ') ?? '',
+            designers: Array.from(item.querySelectorAll('link[type="boardgamedesigner"]')).map(link => '- "' + link.getAttribute('value') + '"').join('\n') ?? '',
+            artists: Array.from(item.querySelectorAll('link[type="boardgameartist"]')).map(link => '- "' + link.getAttribute('value') + '"').join('\n') ?? '',
             rank: item.getElementsByTagName('rank')[0].getAttribute('value'),
             weight: item.getElementsByTagName('averageweight')[0].getAttribute('value'),
             score: item.getElementsByTagName('average')[0].getAttribute('value'),
@@ -152,7 +152,40 @@ class BGGSearchModal extends Modal {
         };
 
         const sanitized_name = details.title.replace(/[\\/*"<>:|?]/g, '')
-        const noteContent = `\-\-\-\nobsidianUIMode: preview\n\-\-\-\n>[!bgg]+ [${details.title}](https://boardgamegeek.com/boardgame/${id})\n>>[!multi-column|left|2]\n>>![test|250](${details.image})\n>>\n>>>[!data]+ Data\n>>>- Year Published: ${details.yearpublished}\n>>>- Players: ${details.minplayers} ~ ${details.maxplayers}\n>>>- Play Time: ${details.minplaytime} ~ ${details.maxplaytime} min\n>>>- Rank: ${details.rank}\n>>>- Weight (0~5): ${details.weight}\n>>>- Score (1~10): ${details.score}\n>>>- Designers: ${details.designers}\n>>>- Artists: ${details.artists}\n\n${details.comments}`
+        const noteContent = `\-\-\-
+title: "${details.title}"
+id: ${id}
+image: "${details.image}"
+yearpublished: ${details.yearpublished}
+minplayers: ${details.minplayers}
+maxplayers: ${details.maxplayers}
+minplaytime: ${details.minplaytime}
+maxplaytime: ${details.maxplaytime}
+rank: ${details.rank}
+weight: ${details.weight}
+score: ${details.score}
+designers: 
+${details.designers}
+artists: 
+${details.artists}
+watching: yes
+obsidianUIMode: preview
+\-\-\-
+>[!bgg]+ [\`= this.title\`](https://boardgamegeek.com/boardgame/${id})
+>>[!multi-column|left|2]
+>>![test|250](${details.image})
+>>
+>>>[!data]+ Data
+>>>- Year Published: \`= this.yearpublished\`
+>>>- Players: \`= this.minplayers\` ~ \`= this.maxplayers\`
+>>>- Play Time: \`= this.minplaytime\` ~ \`= this.maxplaytime\` min
+>>>- Rank: \`= this.rank\`
+>>>- Weight (0~5): \`= this.weight\`
+>>>- Score (1~10): \`= this.score\`
+>>>- Designers: \`= this.designers\`
+>>>- Artists: \`= this.artists\`
+
+${details.comments}`
 
         // Get the notePath from the plugin settings
         let notePath = this.notePath + '/' + sanitized_name + '.md';
