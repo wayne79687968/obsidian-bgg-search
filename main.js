@@ -154,7 +154,7 @@ class BGGSearchModal extends Modal {
 
         const sanitized_name = details.title.replace(/[\\/*"<>:|?]/g, '')
         const noteContent = `\-\-\-
-title: "${details.title}"
+title: "${sanitized_name}"
 id: ${id}
 image: "${details.image}"
 yearpublished: ${details.yearpublished}
