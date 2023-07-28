@@ -161,6 +161,7 @@ class BGGSearchModal extends Modal {
             artists: Array.from(item.querySelectorAll('link[type="boardgameartist"]')).map(link => '- "' + link.getAttribute('value') + '"').join('\n') ?? '',
             rank: item.getElementsByTagName('rank')[0].getAttribute('value'),
             weight: item.getElementsByTagName('averageweight')[0].getAttribute('value'),
+            ratingnum: item.getElementsByTagName('usersrated')[0].getAttribute('value') ?? '',
             score: item.getElementsByTagName('average')[0].getAttribute('value') ?? '',
             description: description,
             comments: item.getElementsByTagName('comment') ? Array.from(item.getElementsByTagName('comment')).slice(0, 50).map(el => `> [!score]+ ( ${el.getAttribute('rating')} )\n> ${el.getAttribute('value')}\n`).join('\n') : ''
@@ -207,6 +208,7 @@ maxplaytime: ${details.maxplaytime}
 playingtime: ${details.playingtime}
 rank: ${details.rank}
 weight: ${details.weight}
+ratingnum: ${details.ratingnum}
 score: ${details.score}
 designers: 
 ${details.designers}
@@ -226,7 +228,7 @@ cssclass: customimg
 >>>- Play Time: \`= this.minplaytime\` ~ \`= this.maxplaytime\` min ( Average **\`= this.playingtime\`** min )
 >>>- Rank: **\`= this.rank\`**
 >>>- Weight: **\`= this.weight\`** / 5
->>>- Score: **\`= this.score\`** / 10
+>>>- Score: **\`= this.score\`** / 10 ( \`= this.ratingnum\` Rating )
 >>>- Designers: \`= this.designers\`
 >>>- Artists: \`= this.artists\`
 >
