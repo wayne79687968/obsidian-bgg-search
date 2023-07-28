@@ -161,26 +161,32 @@ class BGGSearchModal extends Modal {
             artists: Array.from(item.querySelectorAll('link[type="boardgameartist"]')).map(link => '- "' + link.getAttribute('value') + '"').join('\n') ?? '',
             rank: item.getElementsByTagName('rank')[0].getAttribute('value'),
             weight: item.getElementsByTagName('averageweight')[0].getAttribute('value'),
-            score: item.getElementsByTagName('average')[0].getAttribute('value'),
+            score: item.getElementsByTagName('average')[0].getAttribute('value') ?? '',
             description: description,
-            comments: Array.from(item.getElementsByTagName('comment')).slice(0, 50).map(el => `> [!score]+ ( ${el.getAttribute('rating')} )\n> ${el.getAttribute('value')}\n`).join('\n')
+            comments: item.getElementsByTagName('comment') ? Array.from(item.getElementsByTagName('comment')).slice(0, 50).map(el => `> [!score]+ ( ${el.getAttribute('rating')} )\n> ${el.getAttribute('value')}\n`).join('\n') : ''
         };
 
         // Get the suggested_numplayers elements
         let suggestedNumplayers = Array.from(item.getElementsByTagName('poll')).find(poll => poll.getAttribute('name') === 'suggested_numplayers');
         if (suggestedNumplayers) {
-            // Get the results of the poll
-            let results = Array.from(suggestedNumplayers.getElementsByTagName('results'));
-            // Find the result with the most 'best' votes
-            let bestResult = results.reduce((best, result) => {
-                let bestVotes = result.getElementsByTagName('result')[0].getAttribute('numvotes');
-                if (bestVotes > best.bestVotes) {
-                    return { bestVotes, numplayers: result.getAttribute('numplayers') };
-                } else {
-                    return best;
-                }
-            }, { bestVotes: 0, numplayers: null });
-            details.bestplayers = bestResult.numplayers;
+            // Get the totalvotes of the poll
+            let totalvotes = suggestedNumplayers.getAttribute('totalvotes');
+            if (totalvotes === '0') {
+                details.bestplayers = '';
+            } else {
+                // Get the results of the poll
+                let results = Array.from(suggestedNumplayers.getElementsByTagName('results'));
+                // Find the result with the most 'best' votes
+                let bestResult = results.reduce((best, result) => {
+                    let bestVotes = result.getElementsByTagName('result')[0].getAttribute('numvotes');
+                    if (bestVotes > best.bestVotes) {
+                        return { bestVotes, numplayers: result.getAttribute('numplayers') };
+                    } else {
+                        return best;
+                    }
+                }, { bestVotes: 0, numplayers: null });
+                details.bestplayers = bestResult.numplayers;
+            }
         }
 
         // Replace "*" with "\*" in description and comments
