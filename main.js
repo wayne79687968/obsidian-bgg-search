@@ -166,6 +166,23 @@ class BGGSearchModal extends Modal {
             comments: Array.from(item.getElementsByTagName('comment')).slice(0, 50).map(el => `> [!score]+ ( ${el.getAttribute('rating')} )\n> ${el.getAttribute('value')}\n`).join('\n')
         };
 
+        // Get the suggested_numplayers elements
+        let suggestedNumplayers = Array.from(item.getElementsByTagName('poll')).find(poll => poll.getAttribute('name') === 'suggested_numplayers');
+        if (suggestedNumplayers) {
+            // Get the results of the poll
+            let results = Array.from(suggestedNumplayers.getElementsByTagName('results'));
+            // Find the result with the most 'best' votes
+            let bestResult = results.reduce((best, result) => {
+                let bestVotes = result.getElementsByTagName('result')[0].getAttribute('numvotes');
+                if (bestVotes > best.bestVotes) {
+                    return { bestVotes, numplayers: result.getAttribute('numplayers') };
+                } else {
+                    return best;
+                }
+            }, { bestVotes: 0, numplayers: null });
+            details.bestplayers = bestResult.numplayers;
+        }
+
         // Replace "*" with "\*" in description and comments
         details.description = details.description.replace(/\*/g, "\\*");
         details.comments = details.comments.replace(/\*/g, "\\*");
@@ -178,8 +195,10 @@ image: "${details.image}"
 yearpublished: ${details.yearpublished}
 minplayers: ${details.minplayers}
 maxplayers: ${details.maxplayers}
+bestplayers: ${details.bestplayers}
 minplaytime: ${details.minplaytime}
 maxplaytime: ${details.maxplaytime}
+playingtime: ${details.playingtime}
 rank: ${details.rank}
 weight: ${details.weight}
 score: ${details.score}
@@ -189,18 +208,19 @@ artists:
 ${details.artists}
 watching: yes
 obsidianUIMode: preview
+cssclass: customimg
 \-\-\-
 >[!bgg]+ [\`= this.title\`](https://boardgamegeek.com/boardgame/${id})
 >>[!multi-column|left|2]
->>![test|250](${details.image})
+>>![BggImg|250](${details.image})
 >>
 >>>[!data]+ Data
 >>>- Year Published: \`= this.yearpublished\`
->>>- Players: \`= this.minplayers\` ~ \`= this.maxplayers\`
->>>- Play Time: \`= this.minplaytime\` ~ \`= this.maxplaytime\` min
+>>>- Players: \`= this.minplayers\` ~ \`= this.maxplayers\` ( Best For **\`= this.bestplayers\`** )
+>>>- Play Time: \`= this.minplaytime\` ~ \`= this.maxplaytime\` min ( Average **\`= this.playingtime\`** min )
 >>>- Rank: **\`= this.rank\`**
->>>- Weight (0~5): \`= this.weight\`
->>>- Score (1~10): \`= this.score\`
+>>>- Weight: **\`= this.weight\`** / 5
+>>>- Score: **\`= this.score\`** / 10
 >>>- Designers: \`= this.designers\`
 >>>- Artists: \`= this.artists\`
 >
