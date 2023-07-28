@@ -75,7 +75,7 @@ class BGGSearchModal extends Modal {
         });
     }
 
-    async translate(text) {
+    async translate(text, prefix = '') {
         const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${this.apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -86,7 +86,7 @@ class BGGSearchModal extends Modal {
         });
 
         const data = await response.json();
-        return data.data.translations[0].translatedText;
+        return text + '\n' + prefix + data.data.translations[0].translatedText;
     }
 
     async searchBGG(query) {
@@ -106,10 +106,16 @@ class BGGSearchModal extends Modal {
         // Clear the results container
         this.resultsContainer.empty();
 
+        // Check if results is empty
+        if (results.length === 0) {
+            this.resultsContainer.createEl('div', { text: 'No matching results found.', attr: { style: 'font-size: 18px; font-family: inherit; font-weight: 800; color: #ff1744; margin: 30px 0px 10px 20px;' } });
+            return;
+        }
+
         // Display each result
         results.forEach((result) => {
             let resultEl = this.resultsContainer.createEl('div');
-            resultEl.createEl('button', { text: `${result.name} (${result.yearpublished})` }).addEventListener('click', () => this.displayGameDetails(result.id));
+            resultEl.createEl('button', { text: `${result.name} (${result.yearpublished})`, cls: 'underline' }).addEventListener('click', () => this.displayGameDetails(result.id));
         });
     }
 
@@ -121,12 +127,13 @@ class BGGSearchModal extends Modal {
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(data, "text/xml");
         let item = xmlDoc.getElementsByTagName('item')[0];
-
+        let description = item.getElementsByTagName('description')[0].textContent;
         if (this.enableTranslation) {
+            description = await this.translate(description, '>>');
             let comments = Array.from(item.getElementsByTagName('comment')).slice(0, 50);
             for (let i = 0; i < comments.length; i++) {
                 let comment = comments[i];
-                let translatedText = await this.translate(comment.getAttribute('value'), this.translationLanguage, this.apiKey);
+                let translatedText = await this.translate(comment.getAttribute('value'), '>');
                 comment.setAttribute('value', translatedText);
             }
         }
@@ -148,9 +155,13 @@ class BGGSearchModal extends Modal {
             rank: item.getElementsByTagName('rank')[0].getAttribute('value'),
             weight: item.getElementsByTagName('averageweight')[0].getAttribute('value'),
             score: item.getElementsByTagName('average')[0].getAttribute('value'),
-            description: item.getElementsByTagName('description')[0].textContent,
+            description: description,
             comments: Array.from(item.getElementsByTagName('comment')).slice(0, 50).map(el => `> [!score]+ ( ${el.getAttribute('rating')} )\n> ${el.getAttribute('value')}\n`).join('\n')
         };
+
+        // Replace "*" with "\*" in description and comments
+        details.description = details.description.replace(/\*/g, "\\*");
+        details.comments = details.comments.replace(/\*/g, "\\*");
 
         const sanitized_name = details.title.replace(/[\\/*"<>:|?]/g, '')
         const noteContent = `\-\-\-
