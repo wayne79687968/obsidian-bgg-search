@@ -53,20 +53,27 @@ class BGGSearchModal extends Modal {
 
     onOpen() {
         let { contentEl } = this;
+        let searchDiv = contentEl.createEl('div');
+        searchDiv.addClass("orangebutton");
+        searchDiv.style.marginBottom="10px";
+        searchDiv.style.width="90%";
         let searchInput = contentEl.createEl('input', { type: 'text' });
+        searchDiv.appendChild(searchInput);
+        let searchSpan = contentEl.createEl('span');
+        searchSpan.innerText = "Boardgame Name";
+        searchDiv.appendChild(searchSpan);
+
         this.resultsContainer = contentEl.createEl('div');
+        this.resultsContainer.style.display = "inline-grid; justify-items:start; margin-top: 10px;";
 
         searchInput.addEventListener('keydown', async(e) => {
             if (e.key === 'Enter') {
                 // Clear the results container
                 this.resultsContainer.empty();
                 let loadingNotice = new Notice('Loading...');
-
                 let query = e.target.value;
                 let results = await this.searchBGG(query);
-
                 loadingNotice.hide();
-
                 this.displayResults(results);
 
                 // Prevent the modal from closing

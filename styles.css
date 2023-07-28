@@ -1,0 +1,101 @@
+/* Orange Input */
+
+.orangebutton {
+    position: relative;
+}
+
+.orangebutton input {
+    padding: 15px 20px;
+    outline: none;
+    background: transparent;
+    border-radius: 5px;
+    color: #fff;
+    border: 1px solid#ee8456;
+    font-size: 2em;
+    height: 60px;
+    width: 100%;
+}
+
+.orangebutton span {
+    position: absolute;
+    left: 0;
+    padding: 3px 20px;
+    pointer-events: none;
+    font-size: 1em;
+    transition: 0.4s cubic-bezier(0.05, 0.81, 0, 0.93);
+    color: #ee8456;
+    letter-spacing: 0.1em;
+}
+
+.orangebutton input:focus~span,
+.orangebutton input:valid~span {
+    font-size: 0.7em;
+    transform: translateX(14px) translateY(-7.5px);
+    padding: 0 5px;
+    border-radius: 2px;
+    background: #212121;
+    letter-spacing: 0em;
+    border: 1px solid #ee8456;
+}
+
+.orangebutton input:focus,
+.orangebutton input:valid,
+.orangebutton input:active,
+.orangebutton input:hover {
+    border: 1px solid #ee8456;
+    box-shadow: 0 0 0 2px #ee8456;
+}
+
+
+/* Underline Button */
+
+.underline {
+    font-size: 18px;
+    color: #e1e1e1;
+    font-family: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    position: relative;
+    border: none !important;
+    background: none !important;
+    /* text-transform: uppercase; */
+    transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition-duration: 400ms;
+    transition-property: color;
+    margin: 10px 0;
+    margin-left: 10px;
+    box-shadow: none !important;
+}
+
+.underline:focus,
+.underline:hover {
+    color: #fff;
+    box-shadow: none !important;
+}
+
+.underline:focus:after,
+.underline:hover:after {
+    width: 100%;
+    left: 0%;
+}
+
+.underline:after {
+    content: "";
+    pointer-events: none;
+    bottom: -2px;
+    left: 50%;
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    background-color: #fff;
+    transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition-duration: 400ms;
+    transition-property: width, left;
+}
+
+
+/* Modal */
+
+.modal {
+    width: 50%;
+}
