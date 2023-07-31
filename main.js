@@ -173,7 +173,7 @@ class BGGSearchModal extends Modal {
         let details = {
             title: item.getElementsByTagName('name')[0].getAttribute('value'),
             yearpublished: item.getElementsByTagName('yearpublished')[0].getAttribute('value'),
-            image: item.getElementsByTagName('image')[0].textContent,
+            image: item.getElementsByTagName('image')[0] ? item.getElementsByTagName('image')[0].textContent : 'NoImage_BGG.png',
             minplayers: item.getElementsByTagName('minplayers')[0].getAttribute('value'),
             maxplayers: item.getElementsByTagName('maxplayers')[0].getAttribute('value'),
             minplaytime: item.getElementsByTagName('minplaytime')[0].getAttribute('value'),
@@ -217,6 +217,8 @@ class BGGSearchModal extends Modal {
         details.comments = details.comments.replace(/\*/g, "\\*");
 
         const sanitized_name = details.title.replace(/[\\/*"<>:|?]/g, '')
+        let imageMarkdown = details.image === 'NoImage_BGG.png' ? `![BggImg](${details.image})` : `![BggImg|250](${details.image})`;
+
         const noteContent = `\-\-\-
 title: "${sanitized_name}"
 id: ${id}
@@ -242,7 +244,7 @@ cssclass: customimg
 \-\-\-
 >[!bgg]+ [\`= this.title\`](https://boardgamegeek.com/boardgame/${id})
 >>[!multi-column|left|2]
->>![BggImg|250](${details.image})
+>>${imageMarkdown}
 >>
 >>>[!data]+ Data
 >>>- Year Published: \`= this.yearpublished\`
