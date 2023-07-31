@@ -128,6 +128,28 @@ class BGGSearchModal extends Modal {
 
     async displayGameDetails(id) {
         let loadingNotice = new Notice('Loading...');
+        // Create a full screen loading element
+        let loadingEl = document.createElement('div');
+        loadingEl.style.position = 'fixed';
+        loadingEl.style.top = '0';
+        loadingEl.style.left = '0';
+        loadingEl.style.width = '100%';
+        loadingEl.style.height = '100%';
+        loadingEl.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        loadingEl.style.zIndex = '1000';
+        loadingEl.style.display = 'flex';
+        loadingEl.style.justifyContent = 'center';
+        loadingEl.style.alignItems = 'center';
+        loadingEl.innerHTML = `
+            <div class="la-ball-atom la-2x">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        `;
+        document.createElement('div')
+        document.body.appendChild(loadingEl);
 
         let response = await fetch(`https://www.boardgamegeek.com/xmlapi2/thing?id=${id}&stats=1&comments=1`);
         let data = await response.text();
@@ -252,9 +274,14 @@ ${details.comments}`
         }
 
         // Open the new file
-        await this.app.workspace.getLeaf().openFile(note);
+        setTimeout(async () => {
+            await this.app.workspace.getLeaf().openFile(note);
 
-        this.close();
+            // Remove the loading element
+            document.body.removeChild(loadingEl);
+
+            this.close();
+        }, 1000);
     }
 }
 
